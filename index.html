@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App | GhodFada</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+   <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Advanced Weather Background -->
+    <div class="weather-bg" id="weatherBg"></div>
+    
+    <!-- Animated Weather Elements -->
+    <div class="weather-elements" id="weatherElements"></div>
+    
+    <!-- Animated Particles -->
+    <div class="particles" id="particles"></div>
+
+    <div class="main-wrapper">
+        <div class="container">
+            <!-- Advanced Header -->
+            <div class="header">
+                <div class="logo">
+                    <i class="fas fa-cloud-sun"></i>
+                    <span>Weather Pro</span>
+                </div>
+                <div class="header-controls">
+                    <button class="control-btn" onclick="refreshWeather()" title="Refresh">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <button class="control-btn" onclick="toggleSettings()" title="Settings">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <button class="control-btn" onclick="toggleFullscreen()" title="Fullscreen">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Error/Success Messages -->
+            <div class="error-message" id="errorMessage"></div>
+            <div class="success-message" id="successMessage"></div>
+
+            <!-- Location Permission Card -->
+            <div class="location-card" id="locationCard">
+                <h2><i class="fas fa-location-dot"></i> Get Your Weather</h2>
+                <p>Allow location access to see weather for your current location, or choose a city below.</p>
+                <button class="location-btn" onclick="requestLocation()">
+                    <i class="fas fa-location-crosshairs"></i> Use My Location
+                </button>
+                <button class="location-btn secondary" onclick="skipLocation()">
+                    <i class="fas fa-search"></i> Choose City Manually
+                </button>
+            </div>
+
+            <!-- Advanced Search Bar -->
+            <div class="search-container" id="searchContainer" style="display: none;">
+                <div class="search-box">
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search city...">
+                    <button class="voice-btn" onclick="startVoiceSearch()" title="Voice Search">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <button class="search-btn" onclick="searchWeather()">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Cities -->
+            <div class="quick-cities" id="quickCities" style="display: none;">
+                <div class="quick-cities-title">Quick Access:</div>
+                <div class="city-buttons">
+                    <button class="city-btn" onclick="getWeatherByCity('London')">
+                        <i class="fas fa-globe"></i> London
+                    </button>
+                    <button class="city-btn" onclick="getWeatherByCity('Tokyo')">
+                        <i class="fas fa-globe"></i> Tokyo
+                    </button>
+                    <button class="city-btn" onclick="getWeatherByCity('Paris')">
+                        <i class="fas fa-globe"></i> Paris
+                    </button>
+                    <button class="city-btn" onclick="getWeatherByCity('New York')">
+                        <i class="fas fa-globe"></i> New York
+                    </button>
+                    <button class="city-btn" onclick="getWeatherByCity('Sydney')">
+                        <i class="fas fa-globe"></i> Sydney
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p id="loadingText">Loading weather data...</p>
+            </div>
+
+            <!-- Advanced Weather Grid -->
+            <div class="weather-grid" id="weatherGrid" style="display: none;">
+                <!-- Main Weather Card -->
+                <div class="weather-card">
+                    <div class="location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span id="cityName">--</span>
+                    </div>
+                    <div class="date-time" id="dateTime">--</div>
+
+                    <div class="weather-main">
+                        <div class="temperature">
+                            <span id="temp">--</span><sup>°C</sup>
+                        </div>
+                        <div class="weather-icon">
+                            <i class="fas fa-sun" id="weatherIcon"></i>
+                        </div>
+                    </div>
+
+                    <div class="weather-description" id="weatherDesc">--</div>
+
+                    <div class="weather-details">
+                        <div class="detail-card">
+                            <div class="detail-icon"><i class="fas fa-wind"></i></div>
+                            <div class="detail-label">Wind Speed</div>
+                            <div class="detail-value" id="windSpeed">-- km/h</div>
+                        </div>
+                        <div class="detail-card">
+                            <div class="detail-icon"><i class="fas fa-tint"></i></div>
+                            <div class="detail-label">Humidity</div>
+                            <div class="detail-value" id="humidity">--%</div>
+                        </div>
+                        <div class="detail-card">
+                            <div class="detail-icon"><i class="fas fa-compress-arrows-alt"></i></div>
+                            <div class="detail-label">Pressure</div>
+                            <div class="detail-value" id="pressure">-- hPa</div>
+                        </div>
+                        <div class="detail-card">
+                            <div class="detail-icon"><i class="fas fa-eye"></i></div>
+                            <div class="detail-label">Visibility</div>
+                            <div class="detail-value" id="visibility">-- km</div>
+                        </div>
+                        <div class="detail-card">
+                            <div class="detail-icon"><i class="fas fa-sun"></i></div>
+                            <div class="detail-label">UV Index</div>
+                            <div class="detail-value" id="uvIndex">--</div>
+                        </div>
+                        <div class="detail-card">
+                            <div class="detail-icon"><i class="fas fa-thermometer-half"></i></div>
+                            <div class="detail-label">Feels Like</div>
+                            <div class="detail-value" id="feelsLike">--°C</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Side Panel -->
+                <div class="side-panel">
+                    <!-- Sun & Moon Times -->
+                    <div class="panel-card">
+                        <div class="panel-title">
+                            <i class="fas fa-sun"></i>
+                            <span>Sun & Moon</span>
+                        </div>
+                        <div class="sun-moon-times">
+                            <div class="time-item">
+                                <div class="time-label">
+                                    <i class="fas fa-sun"></i>
+                                    <span>Sunrise</span>
+                                </div>
+                                <div class="time-value" id="sunrise">--:--</div>
+                            </div>
+                            <div class="time-item">
+                                <div class="time-label">
+                                    <i class="fas fa-sun"></i>
+                                    <span>Sunset</span>
+                                </div>
+                                <div class="time-value" id="sunset">--:--</div>
+                            </div>
+                            <div class="time-item">
+                                <div class="time-label">
+                                    <i class="fas fa-moon"></i>
+                                    <span>Moonrise</span>
+                                </div>
+                                <div class="time-value" id="moonrise">--:--</div>
+                            </div>
+                            <div class="time-item">
+                                <div class="time-label">
+                                    <i class="fas fa-moon"></i>
+                                    <span>Moonset</span>
+                                </div>
+                                <div class="time-value" id="moonset">--:--</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Air Quality -->
+                    <div class="panel-card">
+                        <div class="panel-title">
+                            <i class="fas fa-wind"></i>
+                            <span>Air Quality</span>
+                        </div>
+                        <div class="air-quality">
+                            <div class="air-quality-index">
+                                <div class="air-quality-value" id="airQualityValue">--</div>
+                                <div class="air-quality-label" id="airQualityLabel">--</div>
+                            </div>
+                            <div class="air-quality-bar">
+                                <div class="air-quality-fill" id="airQualityFill"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Extended Forecast Section -->
+            <div class="extended-forecast" id="extendedForecast" style="display: none;">
+                <h2 class="forecast-title">Extended Forecast</h2>
+                
+                <div class="forecast-tabs">
+                    <div class="forecast-tab active" onclick="switchForecastTab('daily')">Daily</div>
+                    <div class="forecast-tab" onclick="switchForecastTab('hourly')">Hourly</div>
+                    <div class="forecast-tab" onclick="switchForecastTab('radar')">Radar</div>
+                </div>
+
+                <!-- Daily Forecast -->
+                <div class="forecast-grid" id="dailyForecast">
+                    <!-- Forecast items will be populated by API -->
+                </div>
+
+                <!-- Hourly Forecast -->
+                <div class="hourly-forecast" id="hourlyForecast" style="display: none;">
+                    <!-- Hourly items will be populated by API -->
+                </div>
+
+                <!-- Weather Radar -->
+                <div class="weather-map" id="weatherRadar" style="display: none;">
+                    <div class="map-container">
+                        <div class="map-overlay"></div>
+                        <div class="map-content">
+                            <i class="fas fa-satellite"></i>
+                            <p>Weather Radar</p>
+                            <p style="font-size: 14px; opacity: 0.8;">Interactive weather map coming soon</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer with Copyright and Social Links -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="copyright">© GhodFada</div>
+            <div class="social-links">
+                <a href="https://www.instagram.com/theghodfada/" target="_blank" class="social-link" title="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://x.com/theghodfada" target="_blank" class="social-link" title="X (Twitter)">
+                    <i class="fa-brands fa-x-twitter"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Advanced Settings Panel -->
+    <div class="settings-panel" id="settingsPanel">
+        <div class="settings-header">
+            <div class="settings-title">Settings</div>
+            <button class="close-settings" onclick="toggleSettings()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="settings-section">
+            <div class="settings-section-title">
+                <i class="fas fa-thermometer-half"></i>
+                <span>Units</span>
+            </div>
+            <div class="setting-item">
+                <div class="setting-label">Temperature</div>
+                <div class="toggle-switch active" id="tempUnitToggle" onclick="toggleTempUnit()">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+            <div class="setting-item">
+                <div class="setting-label">Wind Speed</div>
+                <div class="toggle-switch" id="windUnitToggle" onclick="toggleWindUnit()">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <div class="settings-section-title">
+                <i class="fas fa-palette"></i>
+                <span>Appearance</span>
+            </div>
+            <div class="setting-item">
+                <div class="setting-label">Animations</div>
+                <div class="toggle-switch active" id="animationsToggle" onclick="toggleAnimations()">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+            <div class="setting-item">
+                <div class="setting-label">Weather Effects</div>
+                <div class="toggle-switch active" id="weatherEffectsToggle" onclick="toggleWeatherEffects()">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <div class="settings-section-title">
+                <i class="fas fa-bell"></i>
+                <span>Notifications</span>
+            </div>
+            <div class="setting-item">
+                <div class="setting-label">Weather Alerts</div>
+                <div class="toggle-switch" id="alertsToggle" onclick="toggleAlerts()">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+            <div class="setting-item">
+                <div class="setting-label">Daily Summary</div>
+                <div class="toggle-switch" id="dailySummaryToggle" onclick="toggleDailySummary()">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://kit.fontawesome.com/c3d83e6c42.js" crossorigin="anonymous"></script>
+   <script src="script.js"></script>
+</body>
+</html>
